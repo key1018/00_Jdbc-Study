@@ -1,4 +1,4 @@
-package com.br.run.select;
+package com.study.run.select;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import com.br.model.vo.Movie;
+import com.study.model.vo.Movie;
 
 public class Select_Many {
 

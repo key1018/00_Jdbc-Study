@@ -1,4 +1,4 @@
-package com.br.model.vo;
+package com.study.model.vo;
 
 // 영화리뷰
 public class Review {

@@ -1,4 +1,4 @@
-package com.br.run.insert;
+package com.study.run.insert;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

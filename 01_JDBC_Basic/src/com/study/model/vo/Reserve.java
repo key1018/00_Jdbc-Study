@@ -1,4 +1,4 @@
-package com.br.model.vo;
+package com.study.model.vo;
 
 // 영화예약
 public class Reserve {

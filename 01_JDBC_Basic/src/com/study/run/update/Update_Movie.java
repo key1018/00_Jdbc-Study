@@ -1,4 +1,4 @@
-package com.br.run.update;
+package com.study.run.update;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

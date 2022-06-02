@@ -1,4 +1,4 @@
-package com.br.run.insert;
+package com.study.run.insert;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,17 +6,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-public class Insert_Reserve {
-	
-
+public class Insert_Review {
 
 	public static void main(String[] args) {
 		
+		Scanner sc = new Scanner(System.in);
+		
 		// * 내 pc(localhost) DB상 KEY계정에 있는 TB_영화테이블에 영화 정보 INSERT 하기
 		// INSERT문 => 처리된 행수 (int 자료형)	=> 트랜잭션 처리(성공적으로 수행했으면 commit, 실패했으면 rollback)
-		// INSERT 예시 ==> INSERT INTO TB_영화 VALUES (SEQ_영화.NEXTVAL, '프레쉬오브더보트', '12세이상', '1989/10/12', DEFAULT, DEFAULT);
-		
-		Scanner sc = new Scanner(System.in);
 
 		// 1. 처리된 행수 받아줄 변수 설정
 		int result = 0;
@@ -27,25 +24,21 @@ public class Insert_Reserve {
 
 		// 3. 실행할 sql문 작성
 
-		// 직접 값 입력받기
-//		String reverse = "INSERT INTO TB_예매 VALUES (1, '주토피아', 1, '취소')";
-
-		// 사용자에게 값 입력받기
-
 		System.out.print("영화번호 : ");
 		String no = sc.nextLine();
 		System.out.print("영화명 : ");
 		String title = sc.nextLine();
-		System.out.print("인원수 : ");
-		int people = sc.nextInt();
-		sc.nextLine();
-		System.out.print("예매확정/취소 : ");
-		String confirm = sc.nextLine();
+		System.out.print("리뷰내용 : ");
+		String content = sc.nextLine();
+		System.out.print("평점 : ");
+		int rate = sc.nextInt();
 
-		String reverse = "INSERT INTO TB_예매 " + "VALUES ('" + no + "', '" + title + "', " + people + "," + "'" + confirm
-				+ "' )";
+		String review = "INSERT INTO TB_리뷰 " + "VALUES ('" + no + "', '" + title + "', '" + content + "', " + rate
+				+ ")";
 
-		System.out.println(reverse);
+		// TB_리뷰
+		System.out.println(review);
+
 		try {
 
 			// 4. jdbc driver 등록
@@ -59,7 +52,7 @@ public class Insert_Reserve {
 
 			// 7. SQL문 전달하면서 실행
 
-			result = stmt.executeUpdate(reverse);
+			result = stmt.executeUpdate(review);
 
 			// 8. 트랜잭션 처리
 			if (result > 0) {

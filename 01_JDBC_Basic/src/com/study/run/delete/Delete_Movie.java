@@ -1,4 +1,4 @@
-package com.br.run.delete;
+package com.study.run.delete;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

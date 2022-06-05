@@ -18,6 +18,39 @@ public class MovieDao {
 	// DB에 직접 접근해서 사용자의 요청에 맞는 sql문 실행 후 결과받기(즉, jdbc과정을 여기서)
 	// 결과를 MemberController로 다시 반환
 	
+	/*
+	 *  * Statement와 PreparedStatement의 특징
+	 *  - 둘 다 sql문을 실행하고 결과를 받아내는 객체 (둘 중 하나 이용하면됨)
+	 *  - Statement가 PreparedStatement의 부모 (상속구조)
+	 *  
+	 *  * Statement와 PreparedStatement의 차이점
+	 *  - Statement 같은 경우 sql문을 바로 전달하면서 실행하는 객체
+	 *    (즉, sql문을 완성형태로 만들어야됨! == 사용자가 입력한 값이 다 채워진 상태로)
+	 *    
+	 *     > 기존의 Statement 방식
+	 *     1) Connection 객체를 통해서 Statement객체 생성
+	 *     		> stmt = conn.createStatement();
+	 *     2) Statement 객체를 통해서 "완성된 sql문"을 실행 및 결과 받기
+	 *     		> 결과 == stmt.execute(Query/Update)(완성된sql문);	=> 값을 바로 전달하기떄문에 sql문은 무조건 완성되어있어야함
+	 *     
+	 *  - PreparedStatment 같은 경우 "미완성된 sql문"을 잠시 보관해둘 수 있는 객체
+	 *    (즉, 사용자가 입력한 값들을 채워두지 않고 각각 들어갈 공간을 미리 확보만 해두면됨)
+	 *    
+	 *   * PreparedStatement 방식
+	 *    1) Connection 객체를 통해 PreparedStatement객체 생성
+	 *    		> pstmt = conn.prepareStatement([완성/미완성된]sql문);
+	 *  
+	 *    2) pstmt에 담긴 sql문이 미완성된 상태일 경우 우선은 완성시켜야됨
+	 *    		> pstmt.setXXX(1, 대체할값);
+	 *    		> pttmt.setXXX(2, 대체할값); 
+	 *    		> ...	
+	 *   
+	 *    3) sql문 실행 및 결과받기
+	 *    		> 결과 = pstmt.execute(Query/Update)();
+	 *    		  단, sql문을 전달하면서 호출하는 것이 아닌 '그냥' 호출
+	 */
+	
+	
 	/**
 	 * 1. 회원 가입 요청처리하는 jdbc
 	 * @param userId : 사용자가 입력한 아이디
@@ -48,8 +81,14 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록(미완성된 sql문)
+			// PreparedStatement 객체 생성(미완성된 sql문)
 			pstmt = conn.prepareStatement(sql); 
+			
+			
+			// *** result = pstmt.executeUpdate();  => 미완성된 sql문이 실행되므로 무조건 sql문을 완성시킨 후에 실행해야함!!!!
+			
+			// pstmt.setString(물음표(홀더)자리, 대체할값)  => '대체할값' (양옆에 홑따움표로 감싸준 데이터가 들어감) => 문자로 들어가고싶은 데이터는 무조건 setString 으로 해야함
+			// pstmt.setInt(물음표(홀더)자리, 대체할값) => 대체할값 (양 옆에 홑따움표로 안감싸줌)
 			
 			// sql문을 완성된 문장으로 바꾸기
 			pstmt.setString(1, userId);
@@ -115,7 +154,7 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 생성
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 생성(미완성된 sql문)
+			// PreparedStatement 객체 생성(미완성된 sql문)
 			pstmt = conn.prepareStatement(sql);
 			
 			// 완성된 sql문으로 바꾸기
@@ -176,7 +215,7 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록(미완성된 sql문)
+			// PreparedStatement 객체 생성(미완성된 sql문)
 			pstmt = conn.prepareStatement(sql);
 			// 완성된 sql문으로 바꾸기
 			pstmt.setString(1, movieNo);
@@ -233,7 +272,7 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록 (미완성된 sql문)
+			// PreparedStatement 객체 생성(미완성된 sql문)
 			pstmt = conn.prepareStatement(sql);
 
 			// 완성된 sql문으로 바꾸기
@@ -292,7 +331,7 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록 (완성된 sql문)
+			// PreparedStatement 객체 등록 (완성된 sql문)
 			pstmt = conn.prepareStatement(sql);
 			
 			// sql문 실행 및 결과받기
@@ -348,7 +387,7 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록 (완성된 sql문)
+			// PreparedStatement 객체 등록 (완성된 sql문)
 			pstmt = conn.prepareStatement(sql);
 			// sql문 실행 및 결과받기
 			rset = pstmt.executeQuery();
@@ -408,7 +447,7 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록(미완성된 sql문)
+			// PreparedStatement 객체 생성(미완성된 sql문)
 			pstmt = conn.prepareStatement(sql);
 			
 			// 완성된 sql문으로 바꾸기
@@ -474,7 +513,7 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록 (미완성된 sql문)
+			// PreparedStatement 객체 생성(미완성된 sql문)
 			pstmt = conn.prepareStatement(sql);
 			
 			// 완성된 sql문으로 바꾸기
@@ -535,7 +574,7 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록 (미완성된 sql문)
+			// PreparedStatement 객체 생성(미완성된 sql문)
 			pstmt = conn.prepareStatement(sql);
 			
 			// 완성된 sql문으로 바꾸기
@@ -589,7 +628,7 @@ public class MovieDao {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// 미완성된 sql문
+			// PreparedStatement 객체 생성(미완성된 sql문)
 			pstmt = conn.prepareStatement(sql);
 			
 			// 완성된 sql문으로 바꾸기

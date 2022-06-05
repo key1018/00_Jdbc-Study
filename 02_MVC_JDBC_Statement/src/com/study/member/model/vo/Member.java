@@ -3,8 +3,7 @@ package com.study.member.model.vo;
 import java.sql.Date; // 조회된 결과를 담기위해서는 java.sql로 해야함
 
 public class Member {
-	
-	private int userNo;
+
 	private String userId;
 	private String userPwd;
 	private String userName;
@@ -15,10 +14,9 @@ public class Member {
 	
 	public Member() {}
 
-	public Member(int userNo, String userId, String userPwd, String userName, String gender, int age, String phone,
+	public Member(String userId, String userPwd, String userName, String gender, int age, String phone,
 			Date enrollDate) {
 		super();
-		this.userNo = userNo;
 		this.userId = userId;
 		this.userPwd = userPwd;
 		this.userName = userName;
@@ -26,26 +24,6 @@ public class Member {
 		this.age = age;
 		this.phone = phone;
 		this.enrollDate = enrollDate;
-	}
-	
-	
-
-	public Member(String userId, String userPwd, String userName, String gender, int age, String phone) {
-		super();
-		this.userId = userId;
-		this.userPwd = userPwd;
-		this.userName = userName;
-		this.gender = gender;
-		this.age = age;
-		this.phone = phone;
-	}
-
-	public int getUserNo() {
-		return userNo;
-	}
-
-	public void setUserNo(int userNo) {
-		this.userNo = userNo;
 	}
 
 	public String getUserId() {
@@ -106,8 +84,8 @@ public class Member {
 
 	@Override
 	public String toString() {
-		return userNo + ", " + userId + ", " + userPwd + ", " + userName + ", " + gender + ", " + age + ", " + phone
-				+ ", " + enrollDate;
+		return "Member [아이디 = " + userId + ", 비밀번호 = " + userPwd + ", 이름 = " + userName
+				+ ", 성별 = " + gender + ", 나이 = " + age + ", 전화번호 = " + phone + ", 회원가입일 = " + enrollDate + "]";
 	}
 
 }

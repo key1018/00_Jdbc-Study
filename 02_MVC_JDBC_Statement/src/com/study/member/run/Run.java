@@ -1,6 +1,6 @@
 package com.study.member.run;
 
-import com.study.member.view.MemberView;
+import com.study.member.view.MovieMenu;
 
 public class Run {
 
@@ -12,8 +12,8 @@ public class Run {
 		 * C (Controller) : 사용자의 요청을 처리해주는 담당 (사용자의 요청을 처리한 후에 그에 해당하는 응답화면을 지정하여 데이터 전송)
 		 */
 		
-		MemberView  m = new MemberView();
-		m.MemberMenu();
+		MovieMenu m = new MovieMenu();
+		m.MovieMenu();
 
 	}
 

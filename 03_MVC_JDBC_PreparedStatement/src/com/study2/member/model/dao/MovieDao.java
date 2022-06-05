@@ -1,15 +1,16 @@
-package com.study.member.model.dao;
+package com.study2.member.model.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import com.study.member.model.vo.Member;
-import com.study.member.model.vo.Movie;
-import com.study.member.model.vo.Review;
+import com.study2.member.model.vo.Member;
+import com.study2.member.model.vo.Movie;
+import com.study2.member.model.vo.Review;
 
 public class MovieDao {
 	
@@ -34,11 +35,11 @@ public class MovieDao {
 		
 		// jdbc를 실행할 객체 생성
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		
-		// 실행할 sql문 생성 (완성된 sql문)
-		String sql = "INSERT INTO TB_회원 VALUES ('" + userId + "', '" + userPwd + "', '" + userName + "', '" + gender + "', " 
-												+ age + ", '" + phone + "', SYSDATE" + ")";		
+		// 실행할 sql문 생성 (완성된 sql문)	
+		
+		String sql = "INSERT INTO TB_회원 VALUES (?, ?, ?, ?, ?, ?, SYSDATE)";
 		
 		System.out.println(sql);
 		
@@ -47,10 +48,19 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록
-			stmt = conn.createStatement();
+			// Statement 객체 등록(미완성된 sql문)
+			pstmt = conn.prepareStatement(sql); 
+			
+			// sql문을 완성된 문장으로 바꾸기
+			pstmt.setString(1, userId);
+			pstmt.setString(2, userPwd);
+			pstmt.setString(3, userName);
+			pstmt.setString(4, gender);
+			pstmt.setInt(5, age);
+			pstmt.setString(6, phone);
+			
 			// int 자료형에 결과값 담기
-			result = stmt.executeUpdate(sql);
+			result = pstmt.executeUpdate();
 			
 			// 트랜잭션 실행
 			if(result > 0) {
@@ -66,7 +76,7 @@ public class MovieDao {
 		} finally {
 			try {
 				// 다 쓴 객체 반납
-				stmt.close();
+				pstmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -92,11 +102,11 @@ public class MovieDao {
 		
 		// jdbc 객체 등록
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		
 		// 실행할 sql문 생성
-		String sql = "INSERT INTO TB_영화 VALUES ('NO.' || LPAD(SEQ_영화.NEXTVAL,3,'0'), '" + movieTitle + "', '" + movieAge + "', '" + openDate + "', "
-												+ "DEFAULT, DEFAULT)";
+		
+		String sql = "INSERT INTO TB_영화 VALUES ('NO.' || LPAD(SEQ_영화.NEXTVAL,3,'0'), ?, ?, ?, DEFAULT, DEFAULT)";
 		
 		System.out.println(sql);
 		
@@ -105,11 +115,16 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 생성
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 생성
-			stmt = conn.createStatement();
+			// Statement 객체 생성(미완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
+			
+			// 완성된 sql문으로 바꾸기
+			pstmt.setString(1, movieTitle);
+			pstmt.setString(2, movieAge);
+			pstmt.setString(3, openDate);
 			
 			// sql 실행 및 결과받기
-			result = stmt.executeUpdate(sql);
+			result = pstmt.executeUpdate(sql);
 			
 			// 트랜잭션 실행
 			if(result > 0) {
@@ -124,7 +139,7 @@ public class MovieDao {
 		} finally {
 			try {
 				// 다 쓴 객체 반납
-				stmt.close();
+				pstmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -137,11 +152,11 @@ public class MovieDao {
 	}
 	
 	/**
-	 * 3. 영화 예매 요청처리하는 jdbc
-	 * @param movieNo : 예매하고싶은 영화번호
-	 * @param audience : 영화를 볼 관객수
-	 * @param confirmed : 예매내역 확인 (확정/취소)
-	 * @return : 영화 얘매 성공여부에 따른 int값 (예매 성공 : 1 | 실패 : 0)
+	 * 3. 영화 예매 요청을 처리하는 jdbc
+	 * @param movieNo : 예매하고자하는 영화번호
+	 * @param audience : 예매하고자하는 영화제목
+	 * @param confirmed : 예매상태확인 (확정/취소)
+	 * @return : 영화 예매의 결과값을 보여주는 int값 (예매 성공 : 1 | 실패 : 0)
 	 */
 	public int insertReserve(String movieNo, int audience, String confirmed) {
 		
@@ -149,10 +164,10 @@ public class MovieDao {
 		int result = 0;
 		
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		
 		// 실행할 sql문 생성
-		String sql = "INSERT INTO TB_예매 VALUES ('" + movieNo + "', " + audience + ", '" + confirmed + "')";
+		String sql = "INSERT INTO TB_예매 VALUES (?, ?, ?)";
 		
 		System.out.println(sql);
 		
@@ -161,11 +176,15 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록
-			stmt = conn.createStatement();
+			// Statement 객체 등록(미완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
+			// 완성된 sql문으로 바꾸기
+			pstmt.setString(1, movieNo);
+			pstmt.setInt(2, audience);
+			pstmt.setString(3, confirmed);
 			
 			// sql문 실행 및 결과받기
-			result = stmt.executeUpdate(sql);
+			result = pstmt.executeUpdate();
 			
 			// 트랜잭션 실행
 			if(result > 0) {
@@ -180,7 +199,7 @@ public class MovieDao {
 		} finally {
 			try {
 				// 다 쓴 객체 반납
-				stmt.close();
+				pstmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -202,11 +221,10 @@ public class MovieDao {
 		int result = 0;
 		
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		
-		// 실행할 sql문 생성
-		String sql = "INSERT INTO TB_리뷰 VALUES ('" + userId + "', '" + movieNo + "', '" + movieTitle + "', '" + content
-												+ "', " + rate + ")";
+		// 실행할 sql문 생성		
+		String sql = "INSERT INTO TB_리뷰 VALUES (?, ?, ?, ?, ?)";
 		
 		System.out.println(sql);
 		
@@ -215,11 +233,18 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록
-			stmt = conn.createStatement();
+			// Statement 객체 등록 (미완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
+
+			// 완성된 sql문으로 바꾸기
+			pstmt.setString(1, userId);
+			pstmt.setString(2, movieNo);
+			pstmt.setString(3, movieTitle);
+			pstmt.setString(4, content);
+			pstmt.setInt(5, rate);
 			
 			// sql문 실행 및 결과받기
-			result = stmt.executeUpdate(sql);
+			result = pstmt.executeUpdate();
 			
 			// 트랜잭션 실행
 			if(result > 0) {
@@ -234,7 +259,7 @@ public class MovieDao {
 		} finally {
 			try {
 				// 다 쓴 객체 반납
-				stmt.close();
+				pstmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -256,7 +281,7 @@ public class MovieDao {
 		ArrayList<Movie> movieList = new ArrayList<>();
 		
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		ResultSet rset = null;
 		
 		// 실행할 sql문 생성
@@ -267,11 +292,11 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록
-			stmt = conn.createStatement();
+			// Statement 객체 등록 (완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
 			
 			// sql문 실행 및 결과받기
-			rset = stmt.executeQuery(sql);
+			rset = pstmt.executeQuery();
 			
 			// movieList에 조회되는 값 넣기
 			while (rset.next()) {
@@ -290,7 +315,7 @@ public class MovieDao {
 			try {
 				// 다 쓴 객체 반납
 				rset.close();
-				stmt.close();
+				pstmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -312,7 +337,7 @@ public class MovieDao {
 		ArrayList<Review> reviewList = new ArrayList<>();
 		
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		ResultSet rset = null;
 		
 		// 실행할 sql문 생성
@@ -323,11 +348,10 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록
-			stmt = conn.createStatement();
-			
+			// Statement 객체 등록 (완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
 			// sql문 실행 및 결과받기
-			rset = stmt.executeQuery(sql);
+			rset = pstmt.executeQuery();
 			
 			// movieList에 조회되는 값 넣기
 			while (rset.next()) {
@@ -345,7 +369,7 @@ public class MovieDao {
 			try {
 				// 다 쓴 객체 반납
 				rset.close();
-				stmt.close();
+				pstmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -368,22 +392,35 @@ public class MovieDao {
 		ArrayList<Review> reviewList = new ArrayList<>();
 		
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		ResultSet rset = null;
 		
-		// 실행할 sql문
-		String sql = "SELECT * FROM TB_리뷰 WHERE MOVIE_TITLE LIKE '%" + keyword + "%' ";
-
+		// 실행할 sql문 생성
+		
+		// 방법1
+//		String sql = "SELECT * FROM TB_리뷰 WHERE MOVIE_TITLE LIKE ?";
+		
+		// 방법2
+		String sql = "SELECT * FROM TB_리뷰 WHERE MOVIE_TITLE LIKE % || ? || %";
 		
 		try {
 			// jdbc driver 등록
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록
-			stmt = conn.createStatement();
+			// Statement 객체 등록(미완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
+			
+			// 완성된 sql문으로 바꾸기
+			
+			// 방법1
+//			pstmt.setString(1, "%" + keyword + "%");
+			
+			// 방법2
+			pstmt.setString(2, keyword);
+			
 			// sql문 실행 및 결과받기
-			rset = stmt.executeQuery(sql);
+			rset = pstmt.executeQuery();
 			
 			// Review 객체에 조회결과 담기
 			while (rset.next()) {
@@ -400,7 +437,7 @@ public class MovieDao {
 			try {
 				// 다 쓴 객체 반납
 				rset.close();
-				stmt.close();
+				pstmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -424,11 +461,10 @@ public class MovieDao {
 		int result = 0;
 		
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		
-		// 실행할 sql문 생성
-		String sql = "UPDATE TB_회원 SET USER_PWD = '" + pwd + "', USER_NAME = '" + name + "', AGE = " + age + ", PHONE = '" + phone + "' "
-					+ "WHERE USER_ID = '" + userId + "' ";
+		// 실행할 sql문 생성 		
+		String sql = "UPDATE TB_회원 SET USER_PWD = ?, USER_NAME = ?, AGE = ?, PHONE = ? WHERE USER_ID = ?";
 		
 		
 		System.out.println(sql);
@@ -438,11 +474,17 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록
-			stmt = conn.createStatement();
+			// Statement 객체 등록 (미완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
+			
+			// 완성된 sql문으로 바꾸기
+			pstmt.setString(1, pwd);
+			pstmt.setString(2, name);
+			pstmt.setInt(3, age);
+			pstmt.setString(4, phone);
 			
 			// sql문 실행 및 결과받기
-			result = stmt.executeUpdate(sql);
+			result = pstmt.executeUpdate();
 			
 			// 트랜잭션 실행
 			if(result > 0) {
@@ -457,7 +499,7 @@ public class MovieDao {
 		} finally {
 			try {
 				// 다 쓴 객체 반납
-				stmt.close();
+				pstmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -481,10 +523,10 @@ public class MovieDao {
 		int result = 0;
 		
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		
 		// 실행할 sql문 생성
-		String sql = "DELETE FROM TB_회원 WHERE USER_ID = '" + userId + "' ";
+		String sql = "DELETE FROM TB_회원 WHERE USER_ID = ?";
 
 		System.out.println(sql);
 		
@@ -493,11 +535,14 @@ public class MovieDao {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			// Connection 객체 등록
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			// Statement 객체 등록
-			stmt = conn.createStatement();
+			// Statement 객체 등록 (미완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
+			
+			// 완성된 sql문으로 바꾸기
+			pstmt.setString(1, userId);
 			
 			// sql문 실행 및 결과받기
-			result = stmt.executeUpdate(sql);
+			result = pstmt.executeUpdate();
 			
 			// 트랜잭션 실행
 			if(result > 0) {
@@ -512,7 +557,7 @@ public class MovieDao {
 		} finally {
 			try {
 				// 다 쓴 객체 반납
-				stmt.close();
+				pstmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -536,17 +581,22 @@ public class MovieDao {
 		Member m = null;
 		
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		ResultSet rset = null;
 		
-		String sql = "SELECT * FROM TB_회원 WHERE USER_ID = '" + userId + "' AND USER_PWD = '" + userPwd + "' ";
+		String sql = "SELECT * FROM TB_회원 WHERE USER_ID = ? AND USER_PWD = ?";
 		
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "KEY", "KEY");
-			stmt = conn.createStatement();
+			// 미완성된 sql문
+			pstmt = conn.prepareStatement(sql);
 			
-			rset = stmt.executeQuery(sql);
+			// 완성된 sql문으로 바꾸기
+			pstmt.setString(1, userId);
+			pstmt.setString(2, userPwd);
+			
+			rset = pstmt.executeQuery();
 			
 			if(rset.next()) {
 				m = new Member(rset.getString("USER_ID"), rset.getString("USER_PWD"),
@@ -560,7 +610,7 @@ public class MovieDao {
 		} finally {
 			try {
 				rset.close();
-				stmt.close();
+				pstmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();

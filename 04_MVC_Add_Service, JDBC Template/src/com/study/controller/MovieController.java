@@ -126,6 +126,15 @@ public class MovieController {
 	 */
 	public void selectKeyReview(String keyword) {
 
+		// keyword값들을 전달하면서 MovieService().selectKeyReview호출하면서 전달받은 값들을
+		// ArrayList<Review>에 전달받기
+		ArrayList<Review> review = new MovieService().selectKeyReview(keyword);
+
+		if (review.isEmpty()) {
+			new MovieMenu().displayNoData(keyword + "와 관련된 영화 리뷰 결과가 없습니다.");
+		} else {
+			new MovieMenu().displayKeyword(review);
+		}
 
 	}
 	
@@ -134,6 +143,15 @@ public class MovieController {
 	 */
 	public void updateMember(String userId, String pwd, String name, String age, String phone) {
 
+		// 입력받은 값들을 전달하면서 MovieService().updateMember호출하고, 그에따라 전달받은 값들을
+		// int result에 전달받기
+		int result = new MovieService().updateMember(userId, pwd, name, Integer.parseInt(age), phone);
+		
+		if(result > 0) {
+			new MovieMenu().displayNoData("회원 정보가 수정되었습니다.");
+		} else {
+			new MovieMenu().displayFail("회원 정보를 수정하는데 실패했습니다.");
+		}
 
 
 	}
@@ -142,7 +160,16 @@ public class MovieController {
 	 * 8. 회원 삭제(탈퇴) 요청을 처리하는 메소드
 	 */
 	public void deleteMember(String userId) {
+		
+		// 입력받은 값(userId)을 전달하면서 MovieService().deleteMember호출하고, 그에따라 전달받은 값들을
+		// int result에 전달받기
+		int result = new MovieService().deleteMember(userId);
 
+		if (result > 0) {
+			new MovieMenu().displayNoData("회원 정보가 삭제되었습니다.");
+		} else {
+			new MovieMenu().displayFail("회원 정보를 삭제하는데 실패했습니다.");
+		}
 
 	}
 	
@@ -150,6 +177,16 @@ public class MovieController {
 	 * 9. 로그인 요청을 처리하는 메소드
 	 */
 	public void loginMember(String userId, String userPwd) {
+		
+		// 입력받은 값(userId, userPwd)을 전달하면서 MovieService().loginMember호출하고, 그에따라 전달받은 값들을
+		// Member 객체에 전달받기
+		Member m = new MovieService().loginMember(userId, userPwd);
+
+		if (m == null) {
+			new MovieMenu().displayFail("로그인에 실패하셨습니다.");
+		} else {
+			new MovieMenu().displaySuccess(m.getUserName() + "님 반갑습니다^^");
+		}
 
 	}
 

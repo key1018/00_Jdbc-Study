@@ -179,7 +179,7 @@ public class MovieMenu {
 		String name = sc.nextLine();
 		System.out.print("나이 : ");
 		String age = sc.nextLine();
-		System.out.println("전화번호 : ");
+		System.out.print("전화번호 : ");
 		String phone = sc.nextLine();
 		
 		mc.updateMember(userId, pwd, name, age, phone);

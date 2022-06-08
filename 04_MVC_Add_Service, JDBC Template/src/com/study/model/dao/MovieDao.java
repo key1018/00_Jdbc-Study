@@ -225,8 +225,8 @@ public class MovieDao {
 			e.printStackTrace();
 		} finally {
 			// 다 쓴 객체 반납(Connection객체 제외 -> 트랜잭션 처리를 안한다해도 객체를 생성한 곳에서 반납하는 것이 좋다)
-			close(rset);
-			close(pstmt);
+			close(rset); // ResultSet 객체 전달하면서 JDBCTemplate 클래스의 close메소드 실행
+			close(pstmt); // PreparedStatement 객체 전달하면서 JDBCTemplate 클래스의 close메소드 실행
 		}
 		
 		// 결과값 return
@@ -269,8 +269,8 @@ public class MovieDao {
 			e.printStackTrace();
 		} finally {
 			// 다 쓴 객체 반납(Connection객체 제외 -> 트랜잭션 처리를 안한다해도 객체를 생성한 곳에서 반납하는 것이 좋다)
-			close(rset);
-			close(pstmt);
+			close(rset); // ResultSet 객체 전달하면서 JDBCTemplate 클래스의 close메소드 실행
+			close(pstmt); // PreparedStatement 객체 전달하면서 JDBCTemplate 클래스의 close메소드 실행
 		}
 		
 		// 결과값 return
@@ -279,51 +279,187 @@ public class MovieDao {
 
 	}
 	
-//	/**
-//	 * 6. 영화 이름(키워드)에 따른 리뷰를 조회하는 jdbc
-//	 * @param keyword : 조회하고자하는 영화이름(키워드)
-//	 * @return : 조회결과가 담겨있는 ArrayList<Review> 
-//	 */
-//	public ArrayList<Review> selectKeyReview(String keyword) {
-//		
-//
-//
-//	}
-//	
-//	/**
-//	 * 7. 회원 정보 수정 요청을 처리하는 jdbc
-//	 * @param userId : 수정을 원하는 회원 아이디
-//	 * @param pwd ~ phone : 수정할 정보들
-//	 * @return : 회원 정보가 수정됐는지 확인하기 위한 int값 (수정 성공 : 1 | 실패 : 0)
-//	 */
-//	public int updateMember(String userId, String pwd, String name, int age, String phone) {
-//		
-//
-//
-//	}
-//	
-//	
-//	/**
-//	 * 8. 회원 삭제(탈퇴) 요청을 처리하는 jdbc 
-//	 * @param userId : 삭제(탈퇴)를 원하는 회원아이디
-//	 * @return : 삭제처리를 확인하기위한 int값 (삭제 성공 : 1 | 실패 : 0)
-//	 */
-//	public int deleteMember(String userId) {
-//		
-//
-//
-//	}
-//	
-//	/**
-//	 * 9. 로그인 요청을 처리하는 jdbc
-//	 * @param userId : 로그인을 원하는 회원아이디
-//	 * @param userPwd : 로그인을 원하는 회원비밀번호
-//	 * @return : 로그인 성공/실패에 따른 값을 담은 Member 객체
-//	 */
-//	public Member loginMember(String userId, String userPwd) {
-//		
-//
-//	}
+	/**
+	 * 6. 영화 이름(키워드)에 따른 리뷰를 조회하는 jdbc
+	 * @param keyword : 조회하고자하는 영화이름(키워드)
+	 * @return : 조회결과가 담겨있는 ArrayList<Review> 
+	 */
+	public ArrayList<Review> selectKeyReview(Connection conn, String keyword) {
+		
+		// select(한 행 및 여러행) => ResultSet => ArrayList<Review>
+		ArrayList<Review> review = new ArrayList<>(); // 텅 빈 리스트
+		
+		// PrepraredStatement 객체 생성
+		PreparedStatement pstmt = null;
+		// ResultSet 객체 생성
+		ResultSet rset = null;
+		
+		// 실행할 sql문 생성
+		String sql = "SELECT * FROM TB_리뷰 WHERE MOVIE_TITLE LIKE ?";
+		
+		try {
+			// pstmt 객체 생성 (미완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
+			// 완성된 sql문으로 만들기
+			pstmt.setString(1, "%" + keyword + "%");
+			
+			// rset에 결과값담기
+			rset = pstmt.executeQuery();
+			
+			// sql문 실행 및 결과받기
+			while(rset.next()) {
+				
+				review.add(new Review(rset.getString("USER_ID")
+									, rset.getString("MOVIE_NO")
+									, rset.getString("MOVIE_TITLE")
+									, rset.getString("CONTENT")
+									, rset.getInt("RATE")
+									));
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 다 쓴 객체 반납
+			close(rset); // ResultSet 객체 전달하면서 JDBCTemplate 클래스의 close메소드 실행
+			close(pstmt); // PreparedStatement 객체 전달하면서 JDBCTemplate 클래스의 close메소드 실행
+		}
+		
+		// 결과값 return 
+		return review;	// 조회결과가 담긴 ArrayList<Review>를 MovieServiece().selectKeyReview에 반환
+
+	}
 	
+	/**
+	 * 7. 회원 정보 수정 요청을 처리하는 jdbc
+	 * @param userId : 수정을 원하는 회원 아이디
+	 * @param pwd ~ phone : 수정할 정보들
+	 * @return : 회원 정보가 수정됐는지 확인하기 위한 int값 (수정 성공 : 1 | 실패 : 0)
+	 */
+	public int updateMember(Connection conn, String userId, String pwd, String name, int age, String phone) {
+			
+		// update -> int -> 트랜잭션 실행
+		int result = 0;
+		
+		// PreparedStatement 객체 생성
+		PreparedStatement pstmt = null;
+		
+		// 실행할 sql문 생성
+		String sql = "UPDATE TB_회원 SET USER_PWD = ?, USER_NAME = ?, AGE = ?, PHONE = ? WHERE USER_ID = ?";
+		
+		try {
+			// pstmt 객체 생성(미완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
+			
+			// 완성된 sql문으로 변경
+			pstmt.setString(1, pwd);
+			pstmt.setString(2, name);
+			pstmt.setInt(3, age);
+			pstmt.setString(4, phone);
+			pstmt.setString(5, userId);
+			
+			// sql문 실행 및 결과받기
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 다 쓴 객체 반납 (Connection 객체 x -> 트랜잭션 실행 x)
+			close(pstmt); // PreparedStatement 객체 전달하면서 JDBCTemplate 클래스의 close메소드 실행
+		}
+
+		// 결과값 return
+		return result; // 수정 결과가 담긴 결과값을 MovieService().updateMember에 반환
+
+	}
+	
+	
+	/**
+	 * 8. 회원 삭제(탈퇴) 요청을 처리하는 jdbc 
+	 * @param userId : 삭제(탈퇴)를 원하는 회원아이디
+	 * @return : 삭제처리를 확인하기위한 int값 (삭제 성공 : 1 | 실패 : 0)
+	 */
+	public int deleteMember(Connection conn, String userId) {
+		
+		// delete => int => 트랜잭션 실행
+		int result = 0;
+		
+		// PreparedStatememt 객체 생성
+		PreparedStatement pstmt = null;
+		
+		// 실행할 sql문 생성
+		String sql = "DELETE FROM TB_회원 WHERE USER_ID = ?";
+		
+		try {
+			// pstmt 객체 완성 (미완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
+			// sql문 완성하기
+			pstmt.setString(1, userId);
+			
+			// sql문 생성 및 결과받기
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 다 쓴 객체 반납하기
+			close(pstmt); // PreparedStatement 객체 전달하면서 JDBCTemplate 클래스의 close메소드 실행
+		}
+
+		// 결과값 return
+		return result; // 삭제 결과가 담긴 결과값을 MovieController().deleteMember에 반환
+
+	}
+	
+	/**
+	 * 9. 로그인 요청을 처리하는 jdbc
+	 * @param userId : 로그인을 원하는 회원아이디
+	 * @param userPwd : 로그인을 원하는 회원비밀번호
+	 * @return : 로그인 성공/실패에 따른 값을 담은 Member 객체
+	 */
+	public Member loginMember(Connection conn, String userId, String userPwd) {
+		
+		// select(한 행) => ResultSet => Member객체
+		Member m = null;
+		
+		// PreparedStatement 객체 생성
+		PreparedStatement pstmt = null;
+		// ResultSet 객체 생성
+		ResultSet rset = null;
+		
+		// 실행할 sql문 생성
+		String sql = "SELECT USER_NAME FROM TB_회원 WHERE USER_ID = ? AND USER_PWD = ?";
+		
+		try {
+			// pstmt 객체 완성 (미완성된 sql문)
+			pstmt = conn.prepareStatement(sql);
+			// sql문 완성하기
+			pstmt.setString(1, userId);
+			pstmt.setString(2, userPwd);
+			
+			// rset에 결과받기
+			rset = pstmt.executeQuery();
+			
+			// sql문 실행 및 결과받기
+			if (rset.next()) {
+
+				m = new Member(); // 기본생성자로 생성
+
+				// user_name에 rset에 들어가있는 값 넣기
+				m.setUserName(rset.getString("USER_NAME"));
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 다 쓴 객체 반납
+			close(rset); // ResultSet 객체 전달하면서 JDBCTemplate 클래스의 close메소드 실행
+			close(pstmt); // PreparedStatement 객체 전달하면서 JDBCTemplate 클래스의 close메소드 실행
+		}
+
+		// 결과값 return
+		return m; // 조회결과가 담긴 Member 객체를 MovieServiece().loginMember에 반환
+
+	}
 
 }

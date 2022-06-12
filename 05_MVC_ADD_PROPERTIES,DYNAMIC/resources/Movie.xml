@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="insertMember">
+		INSERT 
+			INTO TB_회원
+				(
+				 USER_ID
+			   , USER_PWD
+			   , USER_NAME
+			   , GENDER
+			   , AGE
+			   , PHONE
+			   , ENROLL_DATE
+			     )
+			   VALUES
+			   	(
+			   	  ?
+			   	, ?
+			   	, ?
+			   	, ?
+			   	, ?
+			   	, ?
+			   	, SYSDATE
+			   	)
+
+	</entry>
+	
+	<entry key="insertMovie">
+	
+		INSERT
+			INTO TB_영화
+				(
+				  MOVIE_NO
+				, MOVIE_TITLE
+				, MOVIE_AGE
+				, OPEN_DATE
+				, RATE
+				, AUDIENCE
+				)
+				VALUES
+				(
+				 'NO.' || LPAD(SEQ_영화.NEXTVAL, 3, '0')
+				, ?
+				, ?
+				, ?
+				, DEFAULT
+				, DEFAULT
+				)
+	
+	</entry>
+	
+	<entry key="insertReserve">
+	
+		INSERT 
+			INTO TB_예매
+				(
+				  MOVIE_NO
+				, AUDIENCE
+				, CONFIRMED
+				 )
+				VALUES
+				 (
+				    ?
+				  , ?
+				  , ?
+				  )
+	
+	</entry>
+	
+	<entry key="insertReview">
+		INSERT
+			INTO TB_리뷰
+				(
+				  USER_ID
+				, MOVIE_NO
+				, MOVIE_TITLE
+				, CONTENT
+				, RATE
+				)
+			VALUES
+			    (
+			      ?
+			    , ?
+				, ?
+				, ?
+				, ?    
+			     )
+	</entry>
+	
+	<entry key="selectMovie">
+		
+		SELECT 
+			MOVIE_NO
+		  , MOVIE_TITLE
+		  , MOVIE_AGE
+		  , OPEN_DATE
+		  , RATE
+		  , AUDIENCE
+		  FROM TB_영화
+	
+	</entry>
+
+	<entry key="selectReview">
+		
+		SELECT 
+			USER_ID
+	      , MOVIE_NO
+	      , MOVIE_TITLE
+	      , CONTENT
+	      , RATE
+	      FROM TB_리뷰
+	
+	</entry>
+	
+	<entry key="selectKeyword">
+		SELECT 
+			MOVIE_NO
+		  , MOVIE_TITLE
+		  , MOVIE_AGE
+		  , OPEN_DATE
+		 FROM TB_영화
+		 WHERE MOVIE_TITLE LIKE ?
+	
+	</entry>
+	
+	<entry key="updateMember">
+	
+		UPDATE TB_회원
+			SET USER_PWD = ?
+			  , PHONE = ?
+			WHERE USER_ID = ?
+		
+	</entry>
+	
+	<entry key="deleteMember">
+		
+		DELETE 
+			FROM TB_회원 
+		WHERE USER_ID = ?
+	
+	</entry>
+
+</properties>

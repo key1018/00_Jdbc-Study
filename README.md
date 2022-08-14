@@ -1,1 +1,1 @@
-# 00_JDBC-Study
+# JDBC Study
